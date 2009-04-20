@@ -1,0 +1,3 @@
+a-1
+.script console_5_b.txt
+a-2

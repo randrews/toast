@@ -1,0 +1,12 @@
+#!/usr/local/bin/ruby
+
+require 'rubygems'
+gem 'toast'
+require 'toast'
+
+begin
+  bot_class=Toast::ConsoleUtils.get_bot_class_for_name(ARGV[0])
+  Toast::ConsoleChannel.run bot_class
+rescue
+  puts $!.to_s
+end
