@@ -9,13 +9,12 @@ describe Toast::Responder do
   end
 
   it "should be able to send messages" do
-    class << @channel.responder_for('test@localhost')
-      def respond msg
-        say 'a'
-        say 'b'
-        say 'c'
-      end
-    end
+    responder = @channel.responder_for('test@localhost')
+    responder.stub!(:respond).and_return{
+      responder.say 'a'
+      responder.say 'b'
+      responder.say 'c'
+    }
 
     @channel.handle Toast::Message.new('x','test@localhost')
 
@@ -25,23 +24,21 @@ describe Toast::Responder do
   end
 
   it "waiting for messages shouldn't send anything" do
-    class << @channel.responder_for('test@localhost')
-      def respond msg
-        msg2=wait
-        say msg2
-      end
-    end
+    responder = @channel.responder_for('test@localhost')
+    responder.stub!(:respond).and_return{
+      msg2=responder.wait
+      responder.say msg2
+    }
 
     @channel.handle Toast::Message.new('a','test@localhost')
     @channel.output.empty?.should == true
   end
 
   it "should be able to wait for messages" do
-    class << @channel.responder_for('test@localhost')
-      def respond msg
-        msg2=wait
-        say msg2
-      end
+    responder = @channel.responder_for('test@localhost')
+    responder.stub!(:respond).and_return do
+      msg2=responder.wait
+      responder.say msg2
     end
 
     @channel.handle Toast::Message.new('a','test@localhost')
@@ -50,22 +47,16 @@ describe Toast::Responder do
   end
 
   it "should say whatever it returns" do
-    class << @channel.responder_for('test@localhost')
-      def respond msg
-        'foo'
-      end
-    end
+    responder = @channel.responder_for('test@localhost')
+    responder.stub!(:respond).and_return('foo')
 
     @channel.handle Toast::Message.new('a','test@localhost')
     @channel.output[0].text.should == 'foo'
   end
 
   it "shouldn't say anything on returning nil" do
-    class << @channel.responder_for('test@localhost')
-      def respond msg
-        nil
-      end
-    end
+    responder = @channel.responder_for('test@localhost')
+    responder.stub!(:respond).and_return(nil)
 
     @channel.handle Toast::Message.new('a','test@localhost')
     @channel.output.empty?.should == true

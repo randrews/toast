@@ -12,8 +12,9 @@ describe "ConsoleChannel commands" do
   end
 
   it "should respond to .srand" do
-    class << @console.responder_for 'console@localhost'
-      def respond(msg) ; say rand(10) ; end
+    responder = @console.responder_for 'console@localhost'
+    responder.stub!(:respond).and_return do
+      responder.say rand(10)
     end
 
     @console.script=['.srand 5','a']
